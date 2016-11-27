@@ -1,6 +1,7 @@
-import Image
 import argparse
+
 import cv2
+
 
 def main():
     parser = argparse.ArgumentParser(prog="Image Steganography",
@@ -19,51 +20,40 @@ def main():
                                        action="store_true",
                                        help='extract a hidden image from the given image')
 
-    # Samples for add_arguments
-
-    # parser.add_argument('integers', metavar='N', type=int, nargs='+',
-    #                     help='an integer for the accumulator')
-    #
-    # parser.add_argument('--sum', dest='accumulate', action='store_const',
-    #                     const=sum, default=max,
-    #                     help='sum the integers (default: find the max)')
-
-
     args = parser.parse_args()
-
     # Validate the given path points to an image
 
-    # print args
-    # print args.image
-    # print type(args.image)
-    # print Image.isImageType(args.image)
-    # if not Image.isImageType(args.image):
-    #     raise Exception("file provided is not an image")
-        # raise argparse.ArgumentError(parser, "file provided is not an image")
-    # if args.conceal:
-    #     if not Image.isImageType(args.conceal):
-    #         raise argparse.ArgumentError(parser, "file provided is not an image")
-    #
-    # print Image.isImageType(args.image)
-    # print(args.accumulate(args.integers))
+    if args.conceal:
+        host_image_path = args.image.name
+        message_image_path = args.conceal[0].name  # Validate this path
+        conceal_image(host_image_path, message_image_path, True)
 
-    print args
-    host_image_path = args.image.name
-    message_image_path = args.conceal[0].name
+
+def conceal_image(host_image_path, message_image_path, preview):
+    message_img_bw = convert_to_binary_image(message_image_path, preview)
+
+
+def convert_to_binary_image(image_path, preview):
+    img = cv2.imread(image_path)
+    if preview: _preview_image("Original message image", img, keep_open=True)
+
+    img_gray = cv2.imread(image_path, cv2.CV_LOAD_IMAGE_GRAYSCALE)
+    if preview: _preview_image("Gray scale message image", img_gray, keep_open=True)
+
+    (thresh, img_bw) = cv2.threshold(img_gray, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+    if preview:  _preview_image("Black & white message image", img_bw, keep_open=True)
+
+    return img_bw
+
+
+def _preview_image(window_name, cv2_image, **kwargs):
     cv2.startWindowThread()
-    cv2.namedWindow("Preview")
-
-    message_img = cv2.imread(message_image_path)
-    cv2.imshow("Preview", message_img)
+    cv2.namedWindow(window_name)
+    cv2.imshow(window_name, cv2_image)
     cv2.waitKey()
+    if not 'keep_open' in kwargs:
+        cv2.destroyAllWindows()
 
-    message_img_gray = cv2.imread(message_image_path, cv2.CV_LOAD_IMAGE_GRAYSCALE)
-    cv2.imshow("Preview", message_img_gray)
-    cv2.waitKey()
-
-    (thresh, message_img_bw) = cv2.threshold(message_img_gray, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
-    cv2.imshow("Preview", message_img_bw)
-    cv2.waitKey()
 
 if __name__ == '__main__':
     main()
