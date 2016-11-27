@@ -35,8 +35,8 @@ def conceal_image(host_image_path, message_image_path, preview):
     message_img = convert_to_binary_image(message_image_path, preview)
     host_img = cv2.imread(host_image_path)
 
-    _preview_image("To be concealed message image", message_img, keep_open=True)
-    _preview_image("Carrier host image", host_img, keep_open=True)
+    _preview_image("Message Image", message_img, keep_open=True)
+    _preview_image("Carrier Host Image", host_img, keep_open=True)
 
     _conceal(host_img, message_img)
 
@@ -49,17 +49,17 @@ def _conceal(host_img_array, message_img_array):
         for c, pixel in enumerate(row):
             host_img_array[r][c] += pixel
 
-    _preview_image("Output", host_img_array)
+    _preview_image("Output Image", host_img_array)
 
 def convert_to_binary_image(image_path, preview):
     img = cv2.imread(image_path)
-    if preview: _preview_image("Original message image", img, keep_open=True)
+    if preview: _preview_image("Original Message Image", img, keep_open=True)
 
     img_gray = cv2.imread(image_path, cv2.CV_LOAD_IMAGE_GRAYSCALE)
-    if preview: _preview_image("Gray scale message image", img_gray, keep_open=True)
+    if preview: _preview_image("Gray Scale Message Image", img_gray, keep_open=True)
 
     (thresh, img_bw) = cv2.threshold(img_gray, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
-    if preview:  _preview_image("Black & white message image", img_bw)
+    if preview:  _preview_image("Black & White Message Image", img_bw)
 
     return img_bw
 
