@@ -7,7 +7,7 @@ COLOR_LAYER = 0
 
 def main():
     parser = argparse.ArgumentParser(prog="Image Steganography",
-                                     description='Hide content within images.')
+                                     description='Hide an image within another image.')
 
     parser.add_argument('image',
                         type=argparse.FileType(),
