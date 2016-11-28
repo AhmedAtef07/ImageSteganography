@@ -1,6 +1,7 @@
 import argparse
 
 import cv2
+import numpy as np
 
 
 def main():
@@ -30,7 +31,7 @@ def main():
 
 
 def conceal_image(host_image_path, message_image_path, preview):
-    # Validate that the message image can be concealed within the host image
+    # Validate that the message image can be concealed within the host image.
     # Shape (dimensions) of host image should be larger, otherwise crop message image.
     message_img = convert_to_binary_image(message_image_path, preview)
     host_img = cv2.imread(host_image_path)
@@ -40,16 +41,40 @@ def conceal_image(host_image_path, message_image_path, preview):
 
     _conceal(host_img, message_img)
 
+
 def _conceal(host_img_array, message_img_array):
+    """ Conceal 1's as even red pixels. """
     # Convert array of int to array of boolean.
+    layer = 0  # For red.
+
     message_img_array_mask = message_img_array == 0
-    message_img_01 = message_img_array_mask.astype(int)
 
-    for r, row in enumerate(message_img_01):
+    for r, row in enumerate(host_img_array):
+        if r == message_img_array_mask.shape[0]:
+            break
         for c, pixel in enumerate(row):
-            host_img_array[r][c] += pixel
+            if c == message_img_array_mask.shape[1]:
+                break
+            if (message_img_array_mask[r][c]):
+                # Make it even red pixel, it's a 1.
+                if pixel[layer] % 2 != 0:
+                    pixel[layer] -= 1
+            else:
+                # Make it odd red pixel, it's a 0.
+                if pixel[layer] % 2 == 0:
+                    pixel[layer] += 1
 
-    _preview_image("Output Image", host_img_array)
+    _preview_image("Output Image", host_img_array, keep_open=True)
+
+    extracted_img = np.zeros(host_img_array.shape[:2], dtype=np.uint8)
+
+    for r, row in enumerate(host_img_array):
+        for c, pixel in enumerate(row):
+            if pixel[layer] % 2 != 0:
+                extracted_img[r][c] = 255
+
+    _preview_image("Extracted Image", extracted_img)
+
 
 def convert_to_binary_image(image_path, preview):
     img = cv2.imread(image_path)
@@ -71,6 +96,7 @@ def _preview_image(window_name, cv2_image, **kwargs):
     cv2.waitKey()
     if not 'keep_open' in kwargs:
         cv2.destroyAllWindows()
+
 
 if __name__ == '__main__':
     main()
