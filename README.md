@@ -8,7 +8,7 @@ From the root dir and using the samples attached with the repo:
 
     python main.py res/bigimage.jpg -ce res/smallimage_1.jpg
 
-By using the flag `-ce` (conceal and extract) the script with conceal `smallimage_1.jpg` into `bigimage.jpg` producing another image, then extract the concealed image from it.
+By using the flag `-ce` (conceal and extract) the script conceals `smallimage_1.jpg` into `bigimage.jpg` generating another image, then extract the concealed image from it.
 
 ## Screen shots
 ![](http://i.imgur.com/aDu63i7.png)
